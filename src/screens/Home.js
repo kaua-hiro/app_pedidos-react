@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { View, Text, Button, StyleSheet, SafeAreaView } from 'react-native';
-import { SectionPicker } from '../components/SectionPicker';
+import { View, Text, TouchableOpacity, StyleSheet, SafeAreaView, ScrollView } from 'react-native';
+import { CardPicker } from '../components/CardPicker';
 import { produtos, bebidas } from '../constants/data';
 import { calcularTotal, formatarMoeda, gerarResumoPedido } from '../utils/businessRules';
 
@@ -13,76 +13,183 @@ export const Home = () => {
   const confirmarPedido = () => {
     const resumo = gerarResumoPedido(produtoSelecionado, bebidaSelecionada, total);
     if (typeof window !== 'undefined' && window.alert) {
-      window.alert(`✅ Resumo do Pedido\n\n${resumo}`);
+      window.alert(`✅ Pedido Confirmado!\n\n${resumo}`);
     } else {
       import('react-native').then(({ Alert }) => {
-        Alert.alert("✅ Resumo do Pedido", resumo, [{ text: "OK" }]);
+        Alert.alert("✅ Pedido Confirmado!", resumo, [{ text: "OK" }]);
       });
     }
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <Text style={styles.headerTitle}>Fast Food App</Text>
+    <SafeAreaView style={styles.background}>
+      <View style={styles.appContainer}>
+        <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+          <View style={styles.header}>
+            <Text style={styles.headerSubtitle}>FAÇA SEU PEDIDO</Text>
+            <Text style={styles.headerTitle}>DevFood</Text>
+          </View>
 
-      <SectionPicker
-        titulo="1. Escolha o Produto:"
-        itens={produtos}
-        selecionado={produtoSelecionado}
-        setSelecionado={setProdutoSelecionado}
-        estiloFundo="#ffe8e8"
-        corBorda="#ff4d4d"
-      />
+          <CardPicker
+            titulo="Escolha seu lanche"
+            itens={produtos}
+            selecionado={produtoSelecionado}
+            setSelecionado={setProdutoSelecionado}
+          />
 
-      <SectionPicker
-        titulo="2. Escolha a Bebida:"
-        itens={bebidas}
-        selecionado={bebidaSelecionada}
-        setSelecionado={setBebidaSelecionada}
-        estiloFundo="#e8f4ff"
-        corBorda="#4da6ff"
-      />
+          <CardPicker
+            titulo="Escolha sua bebida"
+            itens={bebidas}
+            selecionado={bebidaSelecionada}
+            setSelecionado={setBebidaSelecionada}
+          />
 
-      <View style={styles.summaryContainer}>
-        <Text style={styles.summaryText}>Pedido: {produtoSelecionado} + {bebidaSelecionada}</Text>
-        <Text style={styles.totalText}>Total: {formatarMoeda(total)}</Text>
+          <View style={styles.receiptCard}>
+            <Text style={styles.receiptTitle}>Resumo do pedido</Text>
+            
+            <View style={styles.receiptRow}>
+              <Text style={styles.receiptItem}>1x {produtoSelecionado}</Text>
+              <Text style={styles.receiptPrice}>{formatarMoeda(produtos[produtoSelecionado].preco)}</Text>
+            </View>
+            
+            <View style={styles.receiptRow}>
+              <Text style={styles.receiptItem}>1x {bebidaSelecionada}</Text>
+              <Text style={styles.receiptPrice}>{formatarMoeda(bebidas[bebidaSelecionada].preco)}</Text>
+            </View>
+
+            <View style={styles.dashedLine} />
+
+            <View style={styles.receiptRow}>
+              <Text style={styles.totalLabel}>Total</Text>
+              <Text style={styles.totalValue}>{formatarMoeda(total)}</Text>
+            </View>
+          </View>
+
+        </ScrollView>
+        
+        <View style={styles.footer}>
+          <TouchableOpacity style={styles.checkoutButton} activeOpacity={0.9} onPress={confirmarPedido}>
+            <Text style={styles.checkoutButtonText}>Confirmar Pedido</Text>
+            <Text style={styles.checkoutButtonTotal}>{formatarMoeda(total)}</Text>
+          </TouchableOpacity>
+        </View>
       </View>
-
-      <Button title="Confirmar pedido" color="#28a745" onPress={confirmarPedido} />
     </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
+  background: {
     flex: 1,
-    padding: 20,
-    backgroundColor: '#f8f9fa',
-    justifyContent: 'center',
+    backgroundColor: '#EAECEE',
+  },
+  appContainer: {
+    flex: 1,
+    backgroundColor: '#FAFAFB',
+    width: '100%',
+    maxWidth: 480,
+    alignSelf: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.1,
+    shadowRadius: 20,
+    elevation: 10,
+  },
+  scrollContent: {
+    padding: 24,
+    paddingBottom: 100,
+  },
+  header: {
+    marginTop: 20,
+    marginBottom: 32,
+  },
+  headerSubtitle: {
+    fontSize: 13,
+    color: '#8A94A6',
+    fontWeight: '700',
+    letterSpacing: 1.2,
   },
   headerTitle: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    textAlign: 'center',
-    marginBottom: 20,
-    color: '#343a40',
+    fontSize: 34,
+    fontWeight: '900',
+    color: '#1A1D1E',
+    marginTop: 4,
+    letterSpacing: -0.5,
   },
-  summaryContainer: {
-    backgroundColor: '#e8ffe8',
-    padding: 15,
-    borderRadius: 10,
-    borderLeftWidth: 5,
-    borderLeftColor: '#28a745',
-    marginBottom: 20,
+  receiptCard: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 16,
+    padding: 20,
+    marginTop: 8,
+    borderWidth: 1,
+    borderColor: '#F0F0F0',
   },
-  summaryText: {
+  receiptTitle: {
     fontSize: 16,
-    marginBottom: 5,
-    color: '#212529',
+    fontWeight: '700',
+    color: '#1A1D1E',
+    marginBottom: 16,
   },
-  totalText: {
+  receiptRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  receiptItem: {
+    fontSize: 15,
+    color: '#4A5568',
+    fontWeight: '500',
+  },
+  receiptPrice: {
+    fontSize: 15,
+    color: '#1A1D1E',
+    fontWeight: '600',
+  },
+  dashedLine: {
+    height: 1,
+    borderBottomWidth: 1,
+    borderColor: '#E2E8F0',
+    borderStyle: 'dashed',
+    marginVertical: 16,
+  },
+  totalLabel: {
     fontSize: 18,
-    fontWeight: 'bold',
-    color: '#212529',
+    color: '#1A1D1E',
+    fontWeight: '800',
+  },
+  totalValue: {
+    fontSize: 20,
+    color: '#EA1D2C',
+    fontWeight: '800',
+  },
+  footer: {
+    position: 'absolute',
+    bottom: 0,
+    width: '100%',
+    backgroundColor: '#FFFFFF',
+    padding: 24,
+    paddingTop: 16,
+    borderTopWidth: 1,
+    borderColor: '#F0F0F0',
+  },
+  checkoutButton: {
+    backgroundColor: '#EA1D2C',
+    borderRadius: 12,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 24,
+    height: 56,
+  },
+  checkoutButtonText: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: '700',
+  },
+  checkoutButtonTotal: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: '800',
   }
 });

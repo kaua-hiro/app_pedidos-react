@@ -3,7 +3,10 @@ export const calcularTotal = (precoProduto, precoBebida) => {
 };
 
 export const formatarMoeda = (valor) => {
-  return `R$ ${valor.toFixed(2).replace('.', ',')}`;
+  return new Intl.NumberFormat('pt-BR', {
+    style: 'currency',
+    currency: 'BRL',
+  }).format(valor);
 };
 
 export const gerarResumoPedido = (produto, bebida, total) => {
