@@ -2,6 +2,9 @@
   "expo": {
     "name": "app_pedidos-react",
     "slug": "app_pedidos-react",
+    "experiments": {
+      "baseUrl": "/app_pedidos-react"
+    },
     "web": {
       "bundler": "metro",
       "output": "single"
